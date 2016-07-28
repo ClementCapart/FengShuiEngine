@@ -77,3 +77,11 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+/Debug
+*.sdf
+*.vcxproj
+*.filters
+*.user
+*.opensdf
+*.suo
