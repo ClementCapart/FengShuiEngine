@@ -80,7 +80,6 @@ $RECYCLE.BIN/
 
 /Debug
 *.sdf
-*.vcxproj
 *.filters
 *.user
 *.opensdf
