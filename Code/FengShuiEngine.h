@@ -1,6 +1,7 @@
 #pragma once
 
-#include <GLFW\glfw3.h>
+class Game;
+struct GLFWwindow;
 
 class FengShuiEngine
 {
@@ -57,6 +58,7 @@ public:
 	Settings ParseStartArguments(int argc, char** argv);
 private:
 	GLFWwindow* m_window;
+	Game* m_game;
 	Settings m_settings;
 	State m_state;
 };

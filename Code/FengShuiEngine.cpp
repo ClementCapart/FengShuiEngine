@@ -1,7 +1,9 @@
 #include "FengShuiEngine.h"
 
-#include <GL\GL.h>
 #include <string>
+#include <GLFW\glfw3.h>
+#include "Game.h"
+#include "InputManager.h"
 
 FengShuiEngine* FengShuiEngine::s_instance = nullptr;
 
@@ -35,6 +37,13 @@ bool FengShuiEngine::Init(Settings settings)
 
 	glfwMakeContextCurrent(m_window);
 
+	InputManager::GetInstance()->Init(m_window);
+
+	m_game = new Game();
+
+	m_game->Init(m_window);
+	m_game->Load();
+
 	m_state = State::Initialized;
 
 	return true;
@@ -46,9 +55,12 @@ void FengShuiEngine::Run()
 
 	while (!glfwWindowShouldClose(m_window))
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
+		m_game->Update();
+
+		m_game->Render();
 		glfwSwapBuffers(m_window);
-		glfwPollEvents();
+
+		InputManager::GetInstance()->Update();
 	}
 
 	Quit();
@@ -57,6 +69,11 @@ void FengShuiEngine::Run()
 void FengShuiEngine::Quit()
 {
 	m_state = State::Exiting;
+
+	m_game->Stop();
+	m_game->Unload();
+
+	delete m_game;
 
 	glfwTerminate();
 }
