@@ -1,6 +1,13 @@
 #include "FengShuiEngine_PCH.h"
 #include "Camera.h"
+#include "FengShuiEngine.h"
 
+
+Camera::Camera()
+{
+	m_projectionMatrix.SetIdentity();
+	m_viewMatrix.SetIdentity();
+}
 
 void Camera::SetPosition(Vector3 position)
 {
@@ -20,9 +27,9 @@ void Camera::SetLookDirection(Vector3 forward, Vector3 up)
 	m_viewMatrix.SetColumn(2, forward.Normalized());
 }
 
-void Camera::SetLookAtPosition(Vector3 positionToLookAt)
+void Camera::SetLookAtPosition(Vector3 positionToLookAt, Vector3 up)
 {
-	
+	SetLookDirection((positionToLookAt - m_viewMatrix.GetTranslation()).Normalized(), up);
 }
 
 void Camera::SetPerspective(float fov, float aspectRatio, float nearClipPlane, float farClipPlane)
@@ -32,15 +39,15 @@ void Camera::SetPerspective(float fov, float aspectRatio, float nearClipPlane, f
 		return;
 	}
 
+	float fovRad = fov / 180.0f * M_PI;
+	float tanHalfFov = std::tan(fovRad / 2.0f);
+	float zRange = farClipPlane - nearClipPlane;
+
 	m_projectionMatrix.SetIdentity();
 
-	float frustrumDepth = farClipPlane - nearClipPlane;
-	float oneOverDepth = 1.0f / frustrumDepth;
-
-	m_projectionMatrix.SetValue(1, 1, 1.0f / std::tan(0.5f * (fov / 180.0f * M_PI)));
-	m_projectionMatrix.SetValue(0, 0, m_projectionMatrix.GetValue(1, 1) / aspectRatio);
-	m_projectionMatrix.SetValue(2, 2, farClipPlane * oneOverDepth);
-	m_projectionMatrix.SetValue(3, 2, (-farClipPlane * nearClipPlane) * oneOverDepth);
+	m_projectionMatrix.SetValue(0, 0, aspectRatio * (1.0f / tanHalfFov));
+	m_projectionMatrix.SetValue(1, 1, 1.0f / tanHalfFov);
+	m_projectionMatrix.SetValue(2, 2, -(farClipPlane + nearClipPlane) / zRange);
+	m_projectionMatrix.SetValue(3, 2, (2.0f * farClipPlane * nearClipPlane) / zRange);
 	m_projectionMatrix.SetValue(2, 3, 1.0f);
-	m_projectionMatrix.SetValue(3, 3, 0.0f);
 }

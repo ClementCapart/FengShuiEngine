@@ -55,6 +55,9 @@ public:
 	void Run();
 	void Quit();
 
+	int GetWindowWidth() const { return m_settings.m_Width; }
+	int GetWindowHeight() const { return m_settings.m_Height; }
+
 	Settings ParseStartArguments(int argc, char** argv);
 private:
 	GLFWwindow* m_window;

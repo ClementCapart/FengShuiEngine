@@ -1,4 +1,5 @@
 #pragma once
+#include "Vector3.h"
 
 class World;
 class Camera;
@@ -22,4 +23,5 @@ private:
 	World* m_currentWorld;
 
 	Camera* m_camera;
+	Vector3 m_cameraPosition;
 };
