@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Vector3.h"
 #include "Quaternion.h"
+#include "ShaderManager.h"
 
 Game::~Game()
 {
@@ -18,7 +19,7 @@ static const GLfloat g_vertex_buffer_data[] =
 {
 	-1.0f, -1.0f, 0.0f,
 	1.0f, -1.0f, 0.0f,
-	0.0f, 1.0f, 0.0f,
+	0.0f, 1.0f, 0.0f
 };
 
 static GLuint vertexBuffer = 0;
@@ -38,21 +39,9 @@ void Game::Init(GLFWwindow* window)
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-	Quaternion q1(90.0f, Vector3::Up);
-	Quaternion q2(45.0f, Vector3::Right);
-
-	Quaternion q3 = q1 * q2;
-
-	Vector3 v(1.0f, 0.0f, 0.0f);
-
-	v = q1 * v;
-
-	
-	float angle;
-	q1.ToAxisAngle(v, angle);
-
-	v = Vector3::Zero;
-
+	m_camera = new Camera();
+	m_camera->SetPosition(Vector3(4.0f, 3.0f, 3.0f));
+	m_camera->SetLookDirection(Vector3::Zero, Vector3::Up);
 }
 
 void Game::Load()
@@ -78,7 +67,20 @@ void Game::Update()
 void Game::Render()
 {
 	glClearColor(0.39f, 0.58f, 0.93f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//////////////////////////////////////////////////////////////////////////
+
+	glUseProgram(ShaderManager::GetInstance()->GetProgram(0));
+
+	Matrix modelMatrix;
+	modelMatrix.SetIdentity();
+
+	Matrix mvp = m_camera->GetProjectionMatrix() * m_camera->GetViewMatrix() * modelMatrix;
+
+	//GLuint mvpID = glGetUniformLocation(program_id, "MVP");
+
+	//glUniformMatrix4fv(mvpID, 1, 0, mvp.GetFirstMatrixElement());
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);

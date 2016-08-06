@@ -17,6 +17,16 @@ public:
 	void SetColumn(int columnIndex, Vector3 value);
 	void SetValue(int rowIndex, int columnIndex, float value);
 
+	float GetValue(int rowIndex, int columnIndex) const
+	{
+		if (rowIndex >= 0 && rowIndex < MATRIX_ROW_COUNT && columnIndex >= 0 && columnIndex < MATRIX_COLUMN_COUNT)
+		{
+			return m_elements[rowIndex][columnIndex];
+		}
+		
+		return 0.0f;
+	}
+
 	void Translate(Vector3 translation);
 	void SetTranslation(Vector3 translation);
 
@@ -28,6 +38,8 @@ public:
 
 	void operator=(const Matrix& other);
 	Matrix operator*=(const Matrix& other);	
+
+	const float* GetFirstMatrixElement() const { return &m_elements[0][0]; }
 
 private:
 	float m_elements[MATRIX_COLUMN_COUNT][MATRIX_ROW_COUNT];

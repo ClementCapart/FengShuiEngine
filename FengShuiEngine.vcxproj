@@ -76,6 +76,7 @@
     <ClCompile Include="Code\InputManager.cpp" />
     <ClCompile Include="Code\Main.cpp" />
     <ClCompile Include="Code\Quaternion.cpp" />
+    <ClCompile Include="Code\ShaderManager.cpp" />
     <ClCompile Include="Code\Vector3.cpp" />
     <ClCompile Include="Code\Matrix.cpp" />
   </ItemGroup>
@@ -86,9 +87,14 @@
     <ClInclude Include="Code\Game.h" />
     <ClInclude Include="Code\InputManager.h" />
     <ClInclude Include="Code\Quaternion.h" />
+    <ClInclude Include="Code\ShaderManager.h" />
     <ClInclude Include="Code\World.h" />
     <ClInclude Include="Code\Vector3.h" />
     <ClInclude Include="Code\Matrix.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\BaseFragmentShader.shader" />
+    <None Include="Shaders\BaseVertexShader.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

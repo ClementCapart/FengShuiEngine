@@ -1,6 +1,7 @@
 #pragma once
 
 class World;
+class Camera;
 struct GLFWwindow;
 
 class Game
@@ -19,4 +20,6 @@ public:
 private:
 	GLFWwindow* m_currentWindow;
 	World* m_currentWorld;
+
+	Camera* m_camera;
 };

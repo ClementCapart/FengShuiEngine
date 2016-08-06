@@ -5,6 +5,7 @@
 #include <GLFW\glfw3.h>
 #include "Game.h"
 #include "InputManager.h"
+#include "ShaderManager.h"
 
 FengShuiEngine* FengShuiEngine::s_instance = nullptr;
 
@@ -45,6 +46,8 @@ bool FengShuiEngine::Init(Settings settings)
 		glfwTerminate();
 		return false;
 	}
+
+	ShaderManager::GetInstance()->LoadShader("Shaders/BaseVertexShader.shader", "Shaders/BaseFragmentShader.shader");
 
 	InputManager::GetInstance()->Init(m_window);
 
