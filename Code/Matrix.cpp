@@ -1,5 +1,6 @@
 #include "FengShuiEngine_PCH.h"
 #include "Matrix.h"
+#include <xutility>
 
 Vector3 Matrix::GetTranslation() const
 {
@@ -33,9 +34,9 @@ void Matrix::SetRow(int rowIndex, Vector3 value)
 {
 	if (rowIndex >= 0 && rowIndex < MATRIX_ROW_COUNT)
 	{
-		m_elements[rowIndex][0] = value.X;
-		m_elements[rowIndex][1] = value.Y;
-		m_elements[rowIndex][2] = value.Z;
+		m_elements[0][rowIndex] = value.X;
+		m_elements[1][rowIndex] = value.Y;
+		m_elements[2][rowIndex] = value.Z;
 	}	
 }
 
@@ -171,25 +172,26 @@ void Matrix::operator=(const Matrix& other)
 
 Matrix Matrix::operator*=(const Matrix& other)
 {
-	m_elements[0][0] = m_elements[0][0] * other.m_elements[0][0] + m_elements[0][1] * other.m_elements[1][0] + m_elements[0][2] * m_elements[2][0] + m_elements[0][3] * m_elements[3][0];
-	m_elements[0][1] = m_elements[0][0] * other.m_elements[0][1] + m_elements[0][1] * other.m_elements[1][1] + m_elements[0][2] * m_elements[2][1] + m_elements[0][3] * m_elements[3][1];
-	m_elements[0][2] = m_elements[0][0] * other.m_elements[0][2] + m_elements[0][1] * other.m_elements[1][2] + m_elements[0][2] * m_elements[2][2] + m_elements[0][3] * m_elements[3][2];
-	m_elements[0][3] = m_elements[0][0] * other.m_elements[0][3] + m_elements[0][1] * other.m_elements[1][3] + m_elements[0][2] * m_elements[2][3] + m_elements[0][3] * m_elements[3][3];
+	float elements[MATRIX_COLUMN_COUNT][MATRIX_ROW_COUNT];
 
-	m_elements[1][0] = m_elements[1][0] * other.m_elements[0][0] + m_elements[1][1] * other.m_elements[1][0] + m_elements[1][2] * m_elements[2][0] + m_elements[1][3] * m_elements[3][0];
-	m_elements[1][1] = m_elements[1][0] * other.m_elements[0][1] + m_elements[1][1] * other.m_elements[1][1] + m_elements[1][2] * m_elements[2][1] + m_elements[1][3] * m_elements[3][1];
-	m_elements[1][2] = m_elements[1][0] * other.m_elements[0][2] + m_elements[1][1] * other.m_elements[1][2] + m_elements[1][2] * m_elements[2][2] + m_elements[1][3] * m_elements[3][2];
-	m_elements[1][3] = m_elements[1][0] * other.m_elements[0][3] + m_elements[1][1] * other.m_elements[1][3] + m_elements[1][2] * m_elements[2][3] + m_elements[1][3] * m_elements[3][3];
+	elements[0][0] = other.m_elements[0][0] * m_elements[0][0] + other.m_elements[1][1] * m_elements[1][0] + other.m_elements[0][2] * m_elements[2][0] + other.m_elements[0][3] * m_elements[3][0];
+	elements[0][1] = other.m_elements[0][0] * m_elements[0][1] + other.m_elements[0][1] * m_elements[1][1] + other.m_elements[0][2] * m_elements[2][1] + other.m_elements[0][3] * m_elements[3][1];
+	elements[0][2] = other.m_elements[0][0] * m_elements[0][2] + other.m_elements[0][1] * m_elements[1][2] + other.m_elements[0][2] * m_elements[2][2] + other.m_elements[0][3] * m_elements[3][2];
+	elements[0][3] = other.m_elements[0][0] * m_elements[0][3] + other.m_elements[0][1] * m_elements[1][3] + other.m_elements[0][2] * m_elements[2][3] + other.m_elements[0][3] * m_elements[3][3];
+	elements[1][0] = other.m_elements[1][0] * m_elements[0][0] + other.m_elements[1][1] * m_elements[1][0] + other.m_elements[1][2] * m_elements[2][0] + other.m_elements[1][3] * m_elements[3][0];
+	elements[1][1] = other.m_elements[1][0] * m_elements[0][1] + other.m_elements[1][1] * m_elements[1][1] + other.m_elements[1][2] * m_elements[2][1] + other.m_elements[1][3] * m_elements[3][1];
+	elements[1][2] = other.m_elements[1][0] * m_elements[0][2] + other.m_elements[1][1] * m_elements[1][2] + other.m_elements[1][2] * m_elements[2][2] + other.m_elements[1][3] * m_elements[3][2];
+	elements[1][3] = other.m_elements[1][0] * m_elements[0][3] + other.m_elements[1][1] * m_elements[1][3] + other.m_elements[1][2] * m_elements[2][3] + other.m_elements[1][3] * m_elements[3][3];
+	elements[2][0] = other.m_elements[2][0] * m_elements[0][0] + other.m_elements[2][1] * m_elements[1][0] + other.m_elements[2][2] * m_elements[2][0] + other.m_elements[2][3] * m_elements[3][0];
+	elements[2][1] = other.m_elements[2][0] * m_elements[0][1] + other.m_elements[2][1] * m_elements[1][1] + other.m_elements[2][2] * m_elements[2][1] + other.m_elements[2][3] * m_elements[3][1];
+	elements[2][2] = other.m_elements[2][0] * m_elements[0][2] + other.m_elements[2][1] * m_elements[1][2] + other.m_elements[2][2] * m_elements[2][2] + other.m_elements[2][3] * m_elements[3][2];
+	elements[2][3] = other.m_elements[2][0] * m_elements[0][3] + other.m_elements[2][1] * m_elements[1][3] + other.m_elements[2][2] * m_elements[2][3] + other.m_elements[2][3] * m_elements[3][3];
+	elements[3][0] = other.m_elements[3][0] * m_elements[0][0] + other.m_elements[3][1] * m_elements[1][0] + other.m_elements[3][2] * m_elements[2][0] + other.m_elements[3][3] * m_elements[3][0];
+	elements[3][1] = other.m_elements[3][0] * m_elements[0][1] + other.m_elements[3][1] * m_elements[1][1] + other.m_elements[3][2] * m_elements[2][1] + other.m_elements[3][3] * m_elements[3][1];
+	elements[3][2] = other.m_elements[3][0] * m_elements[0][2] + other.m_elements[3][1] * m_elements[1][2] + other.m_elements[3][2] * m_elements[2][2] + other.m_elements[3][3] * m_elements[3][2];
+	elements[3][3] = other.m_elements[3][0] * m_elements[0][3] + other.m_elements[3][1] * m_elements[1][3] + other.m_elements[3][2] * m_elements[2][3] + other.m_elements[3][3] * m_elements[3][3];
 
-	m_elements[2][0] = m_elements[2][0] * other.m_elements[0][0] + m_elements[2][1] * other.m_elements[1][0] + m_elements[2][2] * m_elements[2][0] + m_elements[2][3] * m_elements[3][0];
-	m_elements[2][1] = m_elements[2][0] * other.m_elements[0][1] + m_elements[2][1] * other.m_elements[1][1] + m_elements[2][2] * m_elements[2][1] + m_elements[2][3] * m_elements[3][1];
-	m_elements[2][2] = m_elements[2][0] * other.m_elements[0][2] + m_elements[2][1] * other.m_elements[1][2] + m_elements[2][2] * m_elements[2][2] + m_elements[2][3] * m_elements[3][2];
-	m_elements[2][3] = m_elements[2][0] * other.m_elements[0][3] + m_elements[2][1] * other.m_elements[1][3] + m_elements[2][2] * m_elements[2][3] + m_elements[2][3] * m_elements[3][3];
-
-	m_elements[3][0] = m_elements[3][0] * other.m_elements[0][0] + m_elements[3][1] * other.m_elements[1][0] + m_elements[3][2] * m_elements[2][0] + m_elements[3][3] * m_elements[3][0];
-	m_elements[3][1] = m_elements[3][0] * other.m_elements[0][1] + m_elements[3][1] * other.m_elements[1][1] + m_elements[3][2] * m_elements[2][1] + m_elements[3][3] * m_elements[3][1];
-	m_elements[3][2] = m_elements[3][0] * other.m_elements[0][2] + m_elements[3][1] * other.m_elements[1][2] + m_elements[3][2] * m_elements[2][2] + m_elements[3][3] * m_elements[3][2];
-	m_elements[3][3] = m_elements[3][0] * other.m_elements[0][3] + m_elements[3][1] * other.m_elements[1][3] + m_elements[3][2] * m_elements[2][3] + m_elements[3][3] * m_elements[3][3];
+	std::memcpy(m_elements, &elements[0][0], sizeof(float)* MATRIX_COLUMN_COUNT * MATRIX_ROW_COUNT);
 
 	return *this;
 }
