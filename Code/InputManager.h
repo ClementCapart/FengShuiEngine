@@ -4,11 +4,6 @@
 
 struct GLFWwindow;
 
-enum Keys
-{
-
-};
-
 class InputManager
 {
 private:

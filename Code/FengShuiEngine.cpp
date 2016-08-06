@@ -1,6 +1,7 @@
+#include "FengShuiEngine_PCH.h"
 #include "FengShuiEngine.h"
-
 #include <string>
+#include <GL/glew.h>
 #include <GLFW\glfw3.h>
 #include "Game.h"
 #include "InputManager.h"
@@ -36,6 +37,14 @@ bool FengShuiEngine::Init(Settings settings)
 	}
 
 	glfwMakeContextCurrent(m_window);
+
+	glewExperimental = true;
+
+	if (glewInit() != GLEW_OK)
+	{
+		glfwTerminate();
+		return false;
+	}
 
 	InputManager::GetInstance()->Init(m_window);
 

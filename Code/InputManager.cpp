@@ -1,5 +1,5 @@
+#include "FengShuiEngine_PCH.h"
 #include "InputManager.h"
-
 #include <GLFW\glfw3.h>
 #include <algorithm>
 #include <iostream>
@@ -64,7 +64,7 @@ void InputManager::DebugKeyboardInput() const
 	system("cls");
 
 	std::cout << "Held Keys: " << std::endl;
-	for (int i = 0; i < m_heldKeys.size(); i++)
+	for (unsigned int i = 0; i < m_heldKeys.size(); i++)
 	{
 		if (i != 0) std::cout << ", ";
 		std::cout << m_heldKeys[i];
@@ -72,7 +72,7 @@ void InputManager::DebugKeyboardInput() const
 	std::cout << std::endl;
 
 	std::cout << "Pressed Keys: " << std::endl;
-	for (int i = 0; i < m_pressedKeys.size(); i++)
+	for (unsigned int i = 0; i < m_pressedKeys.size(); i++)
 	{
 		if (i != 0) std::cout << ", ";
 		std::cout << m_pressedKeys[i];
@@ -80,7 +80,7 @@ void InputManager::DebugKeyboardInput() const
 	std::cout << std::endl;
 
 	std::cout << "Released Keys: " << std::endl;
-	for (int i = 0; i < m_releasedKeys.size(); i++)
+	for (unsigned int i = 0; i < m_releasedKeys.size(); i++)
 	{
 		if (i != 0) std::cout << ", ";
 		std::cout << m_releasedKeys[i];
