@@ -19,42 +19,42 @@ Game::~Game()
 // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
 // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
 static GLfloat g_vertex_buffer_data[] = {
-	-1.0f, -1.0f, 0.0f, // triangle 1 : begin
-	-1.0f, 1.0f, 0.0f,
-	1.0f, 1.0f, 0.0f, // triangle 1 : end
-// 	1.0f, 1.0f, -1.0f, // triangle 2 : begin
-// 	-1.0f, -1.0f, -1.0f,
-// 	-1.0f, 1.0f, -1.0f, // triangle 2 : end
-// 	1.0f, -1.0f, 1.0f,
-// 	-1.0f, -1.0f, -1.0f,
-// 	1.0f, -1.0f, -1.0f,
-// 	1.0f, 1.0f, -1.0f,
-// 	1.0f, -1.0f, -1.0f,
-// 	-1.0f, -1.0f, -1.0f,
-// 	-1.0f, -1.0f, -1.0f,
-// 	-1.0f, 1.0f, 1.0f,
-// 	-1.0f, 1.0f, -1.0f,
-// 	1.0f, -1.0f, 1.0f,
-// 	-1.0f, -1.0f, 1.0f,
-// 	-1.0f, -1.0f, -1.0f,
-// 	-1.0f, 1.0f, 1.0f,
-// 	-1.0f, -1.0f, 1.0f,
-// 	1.0f, -1.0f, 1.0f,
-// 	1.0f, 1.0f, 1.0f,
-// 	1.0f, -1.0f, -1.0f,
-// 	1.0f, 1.0f, -1.0f,
-// 	1.0f, -1.0f, -1.0f,
-// 	1.0f, 1.0f, 1.0f,
-// 	1.0f, -1.0f, 1.0f,
-// 	1.0f, 1.0f, 1.0f,
-// 	1.0f, 1.0f, -1.0f,
-// 	-1.0f, 1.0f, -1.0f,
-// 	1.0f, 1.0f, 1.0f,
-// 	-1.0f, 1.0f, -1.0f,
-// 	-1.0f, 1.0f, 1.0f,
-// 	1.0f, 1.0f, 1.0f,
-// 	-1.0f, 1.0f, 1.0f,
-// 	1.0f, -1.0f, 1.0f
+	-1.0f, -1.0f, -1.0f, // triangle 1 : begin
+	-1.0f, -1.0f, 1.0f,
+	-1.0f, 1.0f, 1.0f, // triangle 1 : end
+	1.0f, 1.0f, -1.0f, // triangle 2 : begin
+	-1.0f, -1.0f, -1.0f,
+	-1.0f, 1.0f, -1.0f, // triangle 2 : end
+	1.0f, -1.0f, 1.0f,
+	-1.0f, -1.0f, -1.0f,
+	1.0f, -1.0f, -1.0f,
+	1.0f, 1.0f, -1.0f,
+	1.0f, -1.0f, -1.0f,
+	-1.0f, -1.0f, -1.0f,
+	-1.0f, -1.0f, -1.0f,
+	-1.0f, 1.0f, 1.0f,
+	-1.0f, 1.0f, -1.0f,
+	1.0f, -1.0f, 1.0f,
+	-1.0f, -1.0f, 1.0f,
+	-1.0f, -1.0f, -1.0f,
+	-1.0f, 1.0f, 1.0f,
+	-1.0f, -1.0f, 1.0f,
+	1.0f, -1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, -1.0f, -1.0f,
+	1.0f, 1.0f, -1.0f,
+	1.0f, -1.0f, -1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, -1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, -1.0f,
+	-1.0f, 1.0f, -1.0f,
+	1.0f, 1.0f, 1.0f,
+	-1.0f, 1.0f, -1.0f,
+	-1.0f, 1.0f, 1.0f,
+	1.0f, 1.0f, 1.0f,
+	-1.0f, 1.0f, 1.0f,
+	1.0f, -1.0f, 1.0f
 };
 
 static const GLfloat g_color_buffer_data[] = {
@@ -152,11 +152,11 @@ void Game::Update()
 
 	if (InputManager::GetInstance()->GetKey(GLFW_KEY_RIGHT))
 	{
-		m_cameraPosition += m_camera->GetViewMatrix().GetColumn(0) * moveSpeed;
+		m_cameraPosition += m_camera->GetDirection().Cross(m_camera->GetUp()) * moveSpeed;
 	}
 	else if (InputManager::GetInstance()->GetKey(GLFW_KEY_LEFT))
 	{
-		m_cameraPosition -= m_camera->GetViewMatrix().GetColumn(0) * moveSpeed;
+		m_cameraPosition -= m_camera->GetDirection().Cross(m_camera->GetUp()) * moveSpeed;
 	}
 
 	if (InputManager::GetInstance()->GetKeyDown(GLFW_KEY_SPACE))
@@ -171,14 +171,12 @@ void Game::Update()
 void Game::Render()
 {
 	glClearColor(0.39f, 0.58f, 0.93f, 1.0f);
-	glClearDepth(0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//////////////////////////////////////////////////////////////////////////
 
 	GLuint shaderProgramID = ShaderManager::GetInstance()->GetProgram(0);
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_GEQUAL);;
 
 	glUseProgram(shaderProgramID);
 
@@ -189,7 +187,7 @@ void Game::Render()
 
 	GLuint mvpID = glGetUniformLocation(shaderProgramID, "MVP");
 
-	glUniformMatrix4fv(mvpID, 1, GL_TRUE, mvp.GetFirstMatrixElement());
+	glUniformMatrix4fv(mvpID, 1, GL_FALSE, mvp.GetFirstMatrixElement());
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -214,7 +212,7 @@ void Game::Render()
 		(void*)0
 		);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLES, 0, 3 * 12);
 
 	glDisableVertexAttribArray(0);
 

@@ -42,7 +42,7 @@ void Camera::SetPerspective(float fov, float aspectRatio, float nearClipPlane, f
 	m_projectionMatrix.SetValue(0, 0, 1.0f / (aspectRatio * tanHalfFov));
 	m_projectionMatrix.SetValue(1, 1, 1.0f / tanHalfFov);
 	m_projectionMatrix.SetValue(2, 2, (farClipPlane + nearClipPlane) / zRange);
-	m_projectionMatrix.SetValue(3, 2, (2.0f * farClipPlane * nearClipPlane) / zRange);
+	m_projectionMatrix.SetValue(3, 2, -(2.0f * farClipPlane * nearClipPlane) / zRange);
 	m_projectionMatrix.SetValue(2, 3, 1.0f);
 	m_projectionMatrix.SetValue(3, 3, 0.0f);
 }

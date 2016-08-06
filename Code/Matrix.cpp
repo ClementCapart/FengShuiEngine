@@ -52,7 +52,7 @@ void Matrix::SetColumn(int columnIndex, Vector3 value)
 
 void Matrix::SetValue(int columnIndex, int rowIndex, float value)
 {
-	if (rowIndex >= 0 && rowIndex < MATRIX_ROW_COUNT && columnIndex >= 0 && columnIndex << MATRIX_COLUMN_COUNT)
+	if (rowIndex >= 0 && rowIndex < MATRIX_ROW_COUNT && columnIndex >= 0 && columnIndex < MATRIX_COLUMN_COUNT)
 	{
 		m_elements[columnIndex][rowIndex] = value;
 	}
@@ -174,7 +174,7 @@ Matrix Matrix::operator*=(const Matrix& other)
 {
 	float elements[MATRIX_COLUMN_COUNT][MATRIX_ROW_COUNT];
 
-	elements[0][0] = other.m_elements[0][0] * m_elements[0][0] + other.m_elements[1][1] * m_elements[1][0] + other.m_elements[0][2] * m_elements[2][0] + other.m_elements[0][3] * m_elements[3][0];
+	elements[0][0] = other.m_elements[0][0] * m_elements[0][0] + other.m_elements[0][1] * m_elements[1][0] + other.m_elements[0][2] * m_elements[2][0] + other.m_elements[0][3] * m_elements[3][0];
 	elements[0][1] = other.m_elements[0][0] * m_elements[0][1] + other.m_elements[0][1] * m_elements[1][1] + other.m_elements[0][2] * m_elements[2][1] + other.m_elements[0][3] * m_elements[3][1];
 	elements[0][2] = other.m_elements[0][0] * m_elements[0][2] + other.m_elements[0][1] * m_elements[1][2] + other.m_elements[0][2] * m_elements[2][2] + other.m_elements[0][3] * m_elements[3][2];
 	elements[0][3] = other.m_elements[0][0] * m_elements[0][3] + other.m_elements[0][1] * m_elements[1][3] + other.m_elements[0][2] * m_elements[2][3] + other.m_elements[0][3] * m_elements[3][3];
