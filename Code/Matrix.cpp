@@ -30,23 +30,25 @@ void Matrix::SetIdentity()
 	}
 }
 
-void Matrix::SetRow(int rowIndex, Vector3 value)
+void Matrix::SetRow(int rowIndex, Vector4 value)
 {
 	if (rowIndex >= 0 && rowIndex < MATRIX_ROW_COUNT)
 	{
 		m_elements[0][rowIndex] = value.X;
 		m_elements[1][rowIndex] = value.Y;
 		m_elements[2][rowIndex] = value.Z;
+		m_elements[3][rowIndex] = value.W;
 	}	
 }
 
-void Matrix::SetColumn(int columnIndex, Vector3 value)
+void Matrix::SetColumn(int columnIndex, Vector4 value)
 {
 	if (columnIndex >= 0 && columnIndex < MATRIX_COLUMN_COUNT)
 	{
 		m_elements[columnIndex][0] = value.X;
 		m_elements[columnIndex][1] = value.Y;
 		m_elements[columnIndex][2] = value.Z;
+		m_elements[columnIndex][3] = value.W;
 	}
 }
 
@@ -95,7 +97,7 @@ void Matrix::Translate(Vector3 translation)
 
 void Matrix::SetTranslation(Vector3 translation)
 {
-	SetColumn(3, translation);
+	SetColumn(3, Vector4(translation.X, translation.Y, translation.Z, 1.0f));
 }
 
 void Matrix::Scale(Vector3 scale)

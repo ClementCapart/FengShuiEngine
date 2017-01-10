@@ -1,5 +1,8 @@
 #pragma once
 
+#include "HelperMacros.h"
+#include "Window\Window.h"
+
 class Game;
 struct GLFWwindow;
 
@@ -23,34 +26,9 @@ public:
 		int m_Height;
 	};
 
-private:
-	FengShuiEngine()
-		: m_window(nullptr), m_state(State::NotInitialized)
-	{}
-	~FengShuiEngine();
-
-	static FengShuiEngine* s_instance;
+	DECLARE_SINGLETON(FengShuiEngine)
 
 public:
-	static FengShuiEngine* GetInstance()
-	{
-		if (s_instance == nullptr)
-		{
-			s_instance = new FengShuiEngine();
-		}
-
-		return s_instance;
-	}
-
-	static void DestroyInstance()
-	{
-		if (s_instance != nullptr)
-		{
-			delete s_instance;
-			s_instance = nullptr;
-		}
-	}
-
 	bool Init(Settings settings = Settings());
 	void Run();
 	void Quit();
@@ -60,7 +38,7 @@ public:
 
 	Settings ParseStartArguments(int argc, char** argv);
 private:
-	GLFWwindow* m_window;
+	Window* m_window;
 	Game* m_game;
 	Settings m_settings;
 	State m_state;

@@ -1,13 +1,22 @@
 #include "FengShuiEngine_PCH.h"
 #include "FengShuiEngine.h"
 #include <string>
-#include <GL/glew.h>
-#include <GLFW\glfw3.h>
 #include "Game.h"
 #include "InputManager.h"
 #include "ShaderManager.h"
 
-FengShuiEngine* FengShuiEngine::s_instance = nullptr;
+#if DIRECTX
+#include "Window/DXWindow.h"
+#else
+#include "Window/GLWindow.h"
+#endif
+
+DEFINE_SINGLETON(FengShuiEngine)
+
+FengShuiEngine::FengShuiEngine()
+	: m_window(nullptr), m_state(State::NotInitialized)
+{
+}
 
 FengShuiEngine::~FengShuiEngine()
 {
@@ -18,34 +27,16 @@ FengShuiEngine::~FengShuiEngine()
 }
 
 bool FengShuiEngine::Init(Settings settings)
-{	
-	if (!glfwInit())
-		return false;
-
-	if (m_window != nullptr)
-	{
-		glfwDestroyWindow(m_window);
-	}
-	
+{			
 	m_settings = settings;
 
-	m_window = glfwCreateWindow(settings.m_Width, settings.m_Height, settings.m_WindowName, NULL, NULL);
+#if DIRECTX
+	m_window = new DXWindow();
+#else
+	m_window = new GLWindow();
+#endif
 
-	if (m_window == nullptr)
-	{
-		glfwTerminate();
-		return false;
-	}
-
-	glfwMakeContextCurrent(m_window);
-
-	glewExperimental = true;
-
-	if (glewInit() != GLEW_OK)
-	{
-		glfwTerminate();
-		return false;
-	}
+	m_window->Init(m_settings.m_Width, m_settings.m_Height, m_settings.m_WindowName);
 
 	ShaderManager::GetInstance()->LoadShader("Shaders/BaseVertexShader.shader", "Shaders/BaseFragmentShader.shader");
 
@@ -65,12 +56,13 @@ void FengShuiEngine::Run()
 {
 	m_state = State::Running;
 
-	while (!glfwWindowShouldClose(m_window))
+	while (!m_window->ShouldClose())
 	{
 		m_game->Update();
 
 		m_game->Render();
-		glfwSwapBuffers(m_window);
+
+		m_window->SwapBuffers();
 
 		InputManager::GetInstance()->Update();
 	}
@@ -86,8 +78,7 @@ void FengShuiEngine::Quit()
 	m_game->Unload();
 
 	delete m_game;
-
-	glfwTerminate();
+	delete m_window;
 }
 
 FengShuiEngine::Settings FengShuiEngine::ParseStartArguments(int argc, char** argv)

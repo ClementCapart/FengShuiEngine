@@ -5,7 +5,17 @@
 #include <fstream>
 #include <vector>
 
-ShaderManager* ShaderManager::s_instance = nullptr;
+DEFINE_SINGLETON(ShaderManager)
+
+ShaderManager::ShaderManager()
+{
+
+}
+
+ShaderManager::~ShaderManager()
+{
+
+}
 
 GLuint ShaderManager::LoadShader(const char* vertexFile, const char* fragmentFile)
 {

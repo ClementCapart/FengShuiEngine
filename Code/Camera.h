@@ -25,6 +25,8 @@ public:
 
 	Vector3 GetUp() const { return m_up; }
 	void SetUp(Vector3 up) { m_up = up; }
+
+	void Update(float deltaTime);
 private:
 	Matrix m_projectionMatrix;
 	Matrix m_viewMatrix;

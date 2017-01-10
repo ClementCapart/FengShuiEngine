@@ -1,6 +1,8 @@
 #include "FengShuiEngine_PCH.h"
 #include "Camera.h"
 #include "FengShuiEngine.h"
+#include "Quaternion.h"
+#include "InputManager.h"
 
 
 Camera::Camera()
@@ -50,10 +52,16 @@ void Camera::SetPerspective(float fov, float aspectRatio, float nearClipPlane, f
 const Matrix& Camera::GetViewMatrix()
 {
 	Vector3 right = m_up.Cross(m_direction).Normalized();
-	m_viewMatrix.SetColumn(0, right);
-	m_viewMatrix.SetColumn(1, m_direction.Cross(right).Normalized());
-	m_viewMatrix.SetColumn(2, m_direction.Normalized());
+	Vector3 up = m_direction.Cross(right).Normalized();
+	m_viewMatrix.SetColumn(0, Vector4(right.X, right.Y, right.Z, 0.0f));
+	m_viewMatrix.SetColumn(1, Vector4(up.X, up.Y, up.Z, 0.0f));
+	m_viewMatrix.SetColumn(2, Vector4(m_direction.X, m_direction.Y, m_direction.Z, 0.0f));
 	m_viewMatrix.SetTranslation(Vector3(-(right.Dot(m_position)), -(m_up.Dot(m_position)), -(m_direction.Dot(m_position))));
 
 	return m_viewMatrix;
+}
+
+void Camera::Update(float deltaTime)
+{
+	//Placeholder controls
 }

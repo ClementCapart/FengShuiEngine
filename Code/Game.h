@@ -3,7 +3,8 @@
 
 class World;
 class Camera;
-struct GLFWwindow;
+class Window;
+class Renderer;
 
 class Game
 {
@@ -11,7 +12,7 @@ public:
 	Game() : m_currentWindow(nullptr), m_currentWorld(nullptr) {}
 	~Game();
 
-	virtual void Init(GLFWwindow* window);
+	virtual void Init(Window* window);
 	virtual void Load();
 	virtual void Stop();
 	virtual void Unload();
@@ -19,7 +20,8 @@ public:
 	virtual void Render();
 
 private:
-	GLFWwindow* m_currentWindow;
+	Window* m_currentWindow;
+	Renderer* m_renderer;
 	World* m_currentWorld;
 
 	Camera* m_camera;

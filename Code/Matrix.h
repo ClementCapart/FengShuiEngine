@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vector3.h"
+#include "Vector4.h"
 
 #define MATRIX_COLUMN_COUNT 4
 #define MATRIX_ROW_COUNT 4
@@ -13,8 +14,8 @@ public:
 	Vector3 GetScale() const;
 
 	void SetIdentity();
-	void SetRow(int rowIndex, Vector3 value);
-	void SetColumn(int columnIndex, Vector3 value);
+	void SetRow(int rowIndex, Vector4 value);
+	void SetColumn(int columnIndex, Vector4 value);
 	void SetValue(int rowIndex, int columnIndex, float value);
 
 	Vector3 GetRow(int rowIndex) const;

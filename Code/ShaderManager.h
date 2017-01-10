@@ -3,6 +3,7 @@
 #include "GL\glew.h"
 #include <string>
 #include <vector>
+#include "HelperMacros.h"
 
 enum ShaderType
 {
@@ -12,28 +13,7 @@ enum ShaderType
 
 class ShaderManager
 {
-private:
-	ShaderManager() {}
-	~ShaderManager() {}
-	static ShaderManager* s_instance;
-public:
-	static ShaderManager* GetInstance()
-	{
-		if (s_instance == nullptr)
-		{
-			s_instance = new ShaderManager();
-		}
-
-		return s_instance;
-	}
-	static void DestroyInstance()
-	{
-		if (s_instance != nullptr)
-		{
-			delete s_instance;
-			s_instance = nullptr;
-		}
-	}
+	DECLARE_SINGLETON(ShaderManager)
 
 public:
 	GLuint LoadShader(const char* vertexFile, const char* fragmentFile);

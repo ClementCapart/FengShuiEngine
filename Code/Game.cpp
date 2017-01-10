@@ -10,6 +10,8 @@
 #include "Quaternion.h"
 #include "ShaderManager.h"
 #include "FengShuiEngine.h"
+#include "DataLoader.h"
+#include "Renderer\GLRenderer.h"
 
 Game::~Game()
 {
@@ -57,6 +59,45 @@ static GLfloat g_vertex_buffer_data[] = {
 	1.0f, -1.0f, 1.0f
 };
 
+static const GLfloat g_uv_buffer_data[] = {
+	0.000059f, 1.0f - 0.000004f,
+	0.000103f, 1.0f - 0.336048f,
+	0.335973f, 1.0f - 0.335903f,
+	1.000023f, 1.0f - 0.000013f,
+	0.667979f, 1.0f - 0.335851f,
+	0.999958f, 1.0f - 0.336064f,
+	0.667979f, 1.0f - 0.335851f,
+	0.336024f, 1.0f - 0.671877f,
+	0.667969f, 1.0f - 0.671889f,
+	1.000023f, 1.0f - 0.000013f,
+	0.668104f, 1.0f - 0.000013f,
+	0.667979f, 1.0f - 0.335851f,
+	0.000059f, 1.0f - 0.000004f,
+	0.335973f, 1.0f - 0.335903f,
+	0.336098f, 1.0f - 0.000071f,
+	0.667979f, 1.0f - 0.335851f,
+	0.335973f, 1.0f - 0.335903f,
+	0.336024f, 1.0f - 0.671877f,
+	1.000004f, 1.0f - 0.671847f,
+	0.999958f, 1.0f - 0.336064f,
+	0.667979f, 1.0f - 0.335851f,
+	0.668104f, 1.0f - 0.000013f,
+	0.335973f, 1.0f - 0.335903f,
+	0.667979f, 1.0f - 0.335851f,
+	0.335973f, 1.0f - 0.335903f,
+	0.668104f, 1.0f - 0.000013f,
+	0.336098f, 1.0f - 0.000071f,
+	0.000103f, 1.0f - 0.336048f,
+	0.000004f, 1.0f - 0.671870f,
+	0.336024f, 1.0f - 0.671877f,
+	0.000103f, 1.0f - 0.336048f,
+	0.336024f, 1.0f - 0.671877f,
+	0.335973f, 1.0f - 0.335903f,
+	0.667969f, 1.0f - 0.671889f,
+	1.000004f, 1.0f - 0.671847f,
+	0.667979f, 1.0f - 0.335851f
+};
+
 static const GLfloat g_color_buffer_data[] = {
 	0.583f, 0.771f, 0.014f,
 	0.609f, 0.115f, 0.436f,
@@ -98,14 +139,30 @@ static const GLfloat g_color_buffer_data[] = {
 
 static GLuint vertexBuffer = 0;
 static GLuint colorBuffer = 0;
+static GLuint uvBuffer = 0;
+static GLuint textureID = 0;
 
-void Game::Init(GLFWwindow* window)
+void Game::Init(Window* window)
 {
 	m_currentWindow = window;
+
+	if (m_renderer != nullptr)
+	{
+		delete m_renderer;
+	}
+
+#if DIRECTX
+	m_renderer = new DXRenderer();
+#else
+	m_renderer = new GLRenderer();
+#endif
+
+	m_renderer->SetClearColor(0.39f, 0.58f, 0.93f, 1.0f);
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);	
+
 	glGenBuffers(1, &vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
@@ -114,12 +171,18 @@ void Game::Init(GLFWwindow* window)
 	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 
+	glGenBuffers(1, &uvBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
+
 	m_camera = new Camera();
 	m_cameraPosition = Vector3(0.0f, 0.0f, -5.0f);
 	m_camera->SetPosition(m_cameraPosition);
 	//m_camera->SetLookDirection(Vector3::Forward, Vector3::Up);
 	m_camera->SetLookAtPosition(Vector3::Zero, Vector3::Up);
 	m_camera->SetPerspective(60.0f, (float)FengShuiEngine::GetInstance()->GetWindowWidth() / (float) FengShuiEngine::GetInstance()->GetWindowHeight(), 0.1f, 1000.0f);
+
+	textureID = DataLoader::GetInstance()->LoadBMP("Data/Textures/Cube.bmp");
 }
 
 void Game::Load()
@@ -162,36 +225,37 @@ void Game::Update()
 	if (InputManager::GetInstance()->GetKeyDown(GLFW_KEY_SPACE))
 	{
 		m_cameraPosition = -m_cameraPosition;
-	}
+	}	
 
- 	m_camera->SetPosition(m_cameraPosition);
-	//m_camera->SetLookAtPosition(Vector3::Zero, Vector3::Up);
+	m_camera->Update(0.0f);
 }
 
 void Game::Render()
 {
-	glClearColor(0.39f, 0.58f, 0.93f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//////////////////////////////////////////////////////////////////////////
+	m_renderer->Clear();
 
 	GLuint shaderProgramID = ShaderManager::GetInstance()->GetProgram(0);
+	
 	glEnable(GL_DEPTH_TEST);
-
 	glUseProgram(shaderProgramID);
 
 	Matrix modelMatrix;
 	modelMatrix.SetIdentity();
+	modelMatrix.SetTranslation(Vector3(0.0f, 0.0f, 15.0f));
 
-	Matrix mvp = m_camera->GetProjectionMatrix() * m_camera->GetViewMatrix() * modelMatrix;
+	Matrix mvp = m_camera->GetProjectionMatrix() * modelMatrix;
 
 	GLuint mvpID = glGetUniformLocation(shaderProgramID, "MVP");
-
 	glUniformMatrix4fv(mvpID, 1, GL_FALSE, mvp.GetFirstMatrixElement());
+	
+	GLuint textureSamplerID = glGetUniformLocation(shaderProgramID, "TextureSampler");
+	glUniform1i(textureSamplerID, 0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureID);
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-
 	glVertexAttribPointer(
 		0,
 		3,
@@ -212,9 +276,18 @@ void Game::Render()
 		(void*)0
 		);
 
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, uvBuffer);
+	glVertexAttribPointer(
+		2,
+		2,
+		GL_FLOAT,
+		GL_TRUE,
+		0,
+		(void*)0
+		);
+
 	glDrawArrays(GL_TRIANGLES, 0, 3 * 12);
 
 	glDisableVertexAttribArray(0);
-
-
 }
