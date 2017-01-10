@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -18,13 +18,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -44,14 +44,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Code\;$(SolutionDir)Dependencies\Include</AdditionalIncludeDirectories>
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>FengShuiEngine_PCH.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)/Dependencies/Libs</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Dependencies\Libs</AdditionalLibraryDirectories>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;opengl32.lib;glew32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -70,24 +70,40 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Code\Camera.cpp" />
+    <ClCompile Include="Code\DataLoader.cpp" />
     <ClCompile Include="Code\FengShuiEngine.cpp" />
     <ClCompile Include="Code\FengShuiEngine_PCH.cpp" />
     <ClCompile Include="Code\Game.cpp" />
     <ClCompile Include="Code\InputManager.cpp" />
     <ClCompile Include="Code\Main.cpp" />
     <ClCompile Include="Code\Quaternion.cpp" />
+    <ClCompile Include="Code\Renderer\GLRenderer.cpp" />
     <ClCompile Include="Code\ShaderManager.cpp" />
+    <ClCompile Include="Code\Vector2.cpp" />
     <ClCompile Include="Code\Vector3.cpp" />
     <ClCompile Include="Code\Matrix.cpp" />
+    <ClCompile Include="Code\Window\DXWindow.cpp" />
+    <ClCompile Include="Code\Window\GLWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Camera.h" />
+    <ClInclude Include="Code\DataLoader.h" />
     <ClInclude Include="Code\FengShuiEngine.h" />
     <ClInclude Include="Code\FengShuiEngine_PCH.h" />
     <ClInclude Include="Code\Game.h" />
+    <ClInclude Include="Code\HelperMacros.h" />
     <ClInclude Include="Code\InputManager.h" />
     <ClInclude Include="Code\Quaternion.h" />
+    <ClInclude Include="Code\Renderer\DXRenderer.h" />
+    <ClInclude Include="Code\Renderer\GLRenderer.h" />
+    <ClInclude Include="Code\Renderer\Mesh.h" />
+    <ClInclude Include="Code\Renderer\Renderer.h" />
     <ClInclude Include="Code\ShaderManager.h" />
+    <ClInclude Include="Code\Vector2.h" />
+    <ClInclude Include="Code\Vector4.h" />
+    <ClInclude Include="Code\Window\DXWindow.h" />
+    <ClInclude Include="Code\Window\GLWindow.h" />
+    <ClInclude Include="Code\Window\Window.h" />
     <ClInclude Include="Code\World.h" />
     <ClInclude Include="Code\Vector3.h" />
     <ClInclude Include="Code\Matrix.h" />
