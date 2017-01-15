@@ -16,6 +16,8 @@ public:
 	float Dot(const Vector3& other) const;
 	Vector3 Cross(const Vector3& other) const;
 
+	void DebugPrint() const;
+
 	//Operators
 	Vector3& operator+= (const Vector3& other)
 	{

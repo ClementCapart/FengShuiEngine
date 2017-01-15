@@ -33,6 +33,11 @@ Vector3 Vector3::Cross(const Vector3& other) const
 	return Vector3(Y * other.Z - Z * other.Y, Z * other.X - X * other.Z, X * other.Y - Y * other.X);
 }
 
+void Vector3::DebugPrint() const
+{
+	std::cout << "{ " << X << ", " << Y << ", " << Z << " }" << std::endl;
+}
+
 /////////////////////////////////////
 
 //Static

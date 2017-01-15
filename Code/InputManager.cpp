@@ -33,7 +33,7 @@ void InputManager::Init(Window* window)
 void InputManager::Update()
 {	
 	//DebugKeyboardInput();
-	DebugMouseInput();
+	//DebugMouseInput();
 
 	m_mousePositionDelta = m_mousePosition - m_lastFrameMousePosition;
 	m_mousePositionDelta.Y = -m_mousePositionDelta.Y;

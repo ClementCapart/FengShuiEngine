@@ -17,9 +17,9 @@ public:
 	void SetRow(int rowIndex, Vector4 value);
 	void SetColumn(int columnIndex, Vector4 value);
 	void SetValue(int rowIndex, int columnIndex, float value);
-
-	Vector3 GetRow(int rowIndex) const;
-	Vector3 GetColumn(int columnIndex) const;
+	
+	Vector4 GetRow(int rowIndex) const;
+	Vector4 GetColumn(int columnIndex) const;
 	float GetValue(int rowIndex, int columnIndex) const;
 	
 
@@ -33,12 +33,14 @@ public:
 	void LookRotation(Vector3 forward, Vector3 up);
 
 	void operator=(const Matrix& other);
-	Matrix operator*=(const Matrix& other);	
+	Matrix operator*=(const Matrix& other);
 
-	const float* GetFirstMatrixElement() const { return &m_elements[0][0]; }
+	void DebugPrint(bool transposed = false) const;
 
-private:
-	float m_elements[MATRIX_COLUMN_COUNT][MATRIX_ROW_COUNT];
+	const float* GetFirstMatrixElement() const { return &m_Matrix[0]; }
+
+private:	
+	float m_Matrix[16];
 };
 
 inline Matrix operator*(Matrix left, const Matrix& right)

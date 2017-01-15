@@ -4,87 +4,103 @@
 
 Vector3 Matrix::GetTranslation() const
 {
-	return Vector3(m_elements[3][0], m_elements[3][1], m_elements[3][2]);
+	return Vector3(m_Matrix[12], m_Matrix[13], m_Matrix[14]);
 }
 
 Vector3 Matrix::GetEulerRotation() const
 {
-	return Vector3(	std::atan2(m_elements[2][1], m_elements[2][2]), 
-					std::atan2(-m_elements[2][0], std::sqrt(m_elements[2][1] * m_elements[2][1] + m_elements[2][2] * m_elements[2][2])),
-					std::atan2(m_elements[1][0], m_elements[0][0])) / (float)(M_PI * 180.0f);
+	float sy = std::sqrt(m_Matrix[0] * m_Matrix[0] + m_Matrix[4] * m_Matrix[4]);
+	bool singular = sy <= 1e-6;
+
+	float x, y, z;
+	if(!singular)
+	{
+		x = std::atan2(-m_Matrix[6], m_Matrix[10]);
+		y = std::atan2(-m_Matrix[2], sy);
+		z = std::atan2(m_Matrix[1], m_Matrix[0]);
+	}
+	else
+	{
+		x = std::atan2(-m_Matrix[9], m_Matrix[5]);
+		y = std::atan2(-m_Matrix[2], sy);
+		z = 0;
+	}
+
+	return Vector3(x, y, z) * 180.0f / M_PI;
 }
 
 Vector3 Matrix::GetScale() const
-{
-	return Vector3(m_elements[0][0], m_elements[1][1], m_elements[2][2]);
+{	
+	//TODO
+	return Vector3(1.0f, 1.0f, 1.0f);
 }
 
 void Matrix::SetIdentity()
 {
-	for (int i = 0; i < 4; i++)
+	for (int row = 0; row < 4; row++)
 	{
-		for (int j = 0; j < 4; j++)
+		for (int column = 0; column < 4; column++)
 		{
-			m_elements[i][j] = (i == j);
+			m_Matrix[(row * 4) + column] = (row == column);
 		}
 	}
 }
 
 void Matrix::SetRow(int rowIndex, Vector4 value)
 {
-	if (rowIndex >= 0 && rowIndex < MATRIX_ROW_COUNT)
+	if (rowIndex >= 0 && rowIndex < 4)
 	{
-		m_elements[0][rowIndex] = value.X;
-		m_elements[1][rowIndex] = value.Y;
-		m_elements[2][rowIndex] = value.Z;
-		m_elements[3][rowIndex] = value.W;
-	}	
+		m_Matrix[rowIndex * 4] = value.X;
+		m_Matrix[rowIndex * 4 + 1] = value.Y;
+		m_Matrix[rowIndex * 4 + 2] = value.Z;
+		m_Matrix[rowIndex * 4 + 3] = value.W;
+	}
 }
 
 void Matrix::SetColumn(int columnIndex, Vector4 value)
-{
-	if (columnIndex >= 0 && columnIndex < MATRIX_COLUMN_COUNT)
+{	
+	if (columnIndex >= 0 && columnIndex < 4)
 	{
-		m_elements[columnIndex][0] = value.X;
-		m_elements[columnIndex][1] = value.Y;
-		m_elements[columnIndex][2] = value.Z;
-		m_elements[columnIndex][3] = value.W;
+		m_Matrix[columnIndex] = value.X;
+		m_Matrix[4 + columnIndex] = value.Y;
+		m_Matrix[8 + columnIndex] = value.Z;
+		m_Matrix[12 + columnIndex] = value.W;
 	}
 }
 
-void Matrix::SetValue(int columnIndex, int rowIndex, float value)
+void Matrix::SetValue(int rowIndex, int columnIndex, float value)
 {
-	if (rowIndex >= 0 && rowIndex < MATRIX_ROW_COUNT && columnIndex >= 0 && columnIndex < MATRIX_COLUMN_COUNT)
+	if (rowIndex >= 0 && rowIndex < 4 && columnIndex >= 0 && columnIndex < 4)
 	{
-		m_elements[columnIndex][rowIndex] = value;
+		m_Matrix[rowIndex * 4 + columnIndex] = value;
 	}
 }
 
-Vector3 Matrix::GetRow(int rowIndex) const
+Vector4 Matrix::GetRow(int rowIndex) const
 {
-	if (rowIndex >= 0 && rowIndex < MATRIX_ROW_COUNT)
+	if (rowIndex >= 0 && rowIndex < 4)
 	{
-		return Vector3(m_elements[0][rowIndex], m_elements[1][rowIndex], m_elements[2][rowIndex]);
+		return Vector4(m_Matrix[rowIndex * 4], m_Matrix[rowIndex * 4 + 1], m_Matrix[rowIndex * 4 + 2], m_Matrix[rowIndex * 4 + 3]);
 	}
 
-	return Vector3();
+	return Vector4();
 }
 
-Vector3 Matrix::GetColumn(int columnIndex) const
+Vector4 Matrix::GetColumn(int columnIndex) const
 {
-	if (columnIndex >= 0 && columnIndex < MATRIX_COLUMN_COUNT)
+	if (columnIndex >= 0 && columnIndex < 4)
 	{
-		return Vector3(m_elements[0][columnIndex], m_elements[1][columnIndex], m_elements[2][columnIndex]);
+		return Vector4(m_Matrix[columnIndex], m_Matrix[4 + columnIndex], m_Matrix[8 + columnIndex], m_Matrix[12 + columnIndex]);
 	}
 
-	return Vector3();
+	return Vector4();
 }
 
 float Matrix::GetValue(int columnIndex, int rowIndex) const
 {
-	if (rowIndex >= 0 && rowIndex < MATRIX_ROW_COUNT && columnIndex >= 0 && columnIndex < MATRIX_COLUMN_COUNT)
+	if (rowIndex >= 0 && rowIndex < 4 && columnIndex >= 0 && columnIndex < 4)
 	{
-		return m_elements[columnIndex][rowIndex];
+		return m_Matrix[rowIndex * 4 + columnIndex];
 	}
 
 	return 0.0f;
@@ -97,7 +113,7 @@ void Matrix::Translate(Vector3 translation)
 
 void Matrix::SetTranslation(Vector3 translation)
 {
-	SetColumn(3, Vector4(translation.X, translation.Y, translation.Z, 1.0f));
+	SetRow(3, Vector4(translation.X, translation.Y, translation.Z, 1.0f));
 }
 
 void Matrix::Scale(Vector3 scale)
@@ -107,14 +123,12 @@ void Matrix::Scale(Vector3 scale)
 
 void Matrix::SetScale(Vector3 scale)
 {
-	m_elements[0][0] *= scale.X;
-	m_elements[1][1] *= scale.Y;
-	m_elements[2][2] *= scale.Z;
+	
 }
 
 void Matrix::RotateEuler(Vector3 eulerAngle)
 {
-	eulerAngle /= (float)(180.0f * M_PI);
+	eulerAngle *= (float)(M_PI / 180.0f);
 
 	Matrix xAngle;
 	xAngle.SetIdentity();
@@ -123,77 +137,97 @@ void Matrix::RotateEuler(Vector3 eulerAngle)
 	Matrix zAngle;
 	zAngle.SetIdentity();
 
-	xAngle.m_elements[1][1] = std::cos(eulerAngle.X);
-	xAngle.m_elements[1][2] = std::sin(eulerAngle.X);
-	xAngle.m_elements[2][1] = -std::sin(eulerAngle.X);
-	xAngle.m_elements[2][2] = std::cos(eulerAngle.X);
+	xAngle.m_Matrix[5] = std::cos(eulerAngle.X);
+	xAngle.m_Matrix[6] = std::sin(eulerAngle.X);
+	xAngle.m_Matrix[9] = -std::sin(eulerAngle.X);
+	xAngle.m_Matrix[10] = std::cos(eulerAngle.X);
 	
-	yAngle.m_elements[0][0] = std::cos(eulerAngle.Y);
-	yAngle.m_elements[0][2] = -std::sin(eulerAngle.Y);
-	yAngle.m_elements[2][0] = std::sin(eulerAngle.Y);
-	yAngle.m_elements[2][2] = std::cos(eulerAngle.Y);
+	yAngle.m_Matrix[0] = std::cos(eulerAngle.Y);
+	yAngle.m_Matrix[2] = -std::sin(eulerAngle.Y);
+	yAngle.m_Matrix[8] = std::sin(eulerAngle.Y);
+	yAngle.m_Matrix[10] = std::cos(eulerAngle.Y);
 	
-	zAngle.m_elements[0][0] = std::cos(eulerAngle.Z);
-	zAngle.m_elements[0][1] = std::sin(eulerAngle.Z);
-	zAngle.m_elements[1][0] = -std::sin(eulerAngle.Z);
-	zAngle.m_elements[1][1] = std::cos(eulerAngle.X);
+	zAngle.m_Matrix[0] = std::cos(eulerAngle.Z);
+	zAngle.m_Matrix[1] = std::sin(eulerAngle.Z);
+	zAngle.m_Matrix[4] = -std::sin(eulerAngle.Z);
+	zAngle.m_Matrix[5] = std::cos(eulerAngle.Z);
 
 	Matrix result = zAngle * yAngle * xAngle;
 
-	for (int i = 0; i < MATRIX_COLUMN_COUNT; i++)
-	{
-		for (int j = 0; j < MATRIX_ROW_COUNT; j++)
-		{
-			m_elements[i][j] = result.m_elements[i][j];
-		}
-	}
+	std::memcpy(m_Matrix, result.GetFirstMatrixElement(), sizeof(float) * 16);
 }
 
 void Matrix::operator=(const Matrix& other)
 {
-	m_elements[0][0] = other.m_elements[0][0];
-	m_elements[0][1] = other.m_elements[0][1];
-	m_elements[0][2] = other.m_elements[0][2];
-	m_elements[0][3] = other.m_elements[0][3];
-
-	m_elements[1][0] = other.m_elements[1][0];
-	m_elements[1][1] = other.m_elements[1][1];
-	m_elements[1][2] = other.m_elements[1][2];
-	m_elements[1][3] = other.m_elements[1][3];
-
-	m_elements[2][0] = other.m_elements[2][0];
-	m_elements[2][1] = other.m_elements[2][1];
-	m_elements[2][2] = other.m_elements[2][2];
-	m_elements[2][3] = other.m_elements[2][3];
-
-	m_elements[3][0] = other.m_elements[3][0];
-	m_elements[3][1] = other.m_elements[3][1];
-	m_elements[3][2] = other.m_elements[3][2];
-	m_elements[3][3] = other.m_elements[3][3];
+	m_Matrix[0] = other.m_Matrix[0];
+	m_Matrix[1] = other.m_Matrix[1];
+	m_Matrix[2] = other.m_Matrix[2];
+	m_Matrix[3] = other.m_Matrix[3];
+						
+	m_Matrix[5] = other.m_Matrix[4];
+	m_Matrix[6] = other.m_Matrix[5];
+	m_Matrix[7] = other.m_Matrix[6];
+	m_Matrix[8] = other.m_Matrix[7];
+						
+	m_Matrix[9] = other.m_Matrix[8];
+	m_Matrix[10] = other.m_Matrix[9];
+	m_Matrix[11] = other.m_Matrix[10];
+	m_Matrix[12] = other.m_Matrix[11];
+						
+	m_Matrix[13] = other.m_Matrix[12];
+	m_Matrix[14] = other.m_Matrix[13];
+	m_Matrix[15] = other.m_Matrix[14];
+	m_Matrix[16] = other.m_Matrix[15];
 }
 
 Matrix Matrix::operator*=(const Matrix& other)
 {
-	float elements[MATRIX_COLUMN_COUNT][MATRIX_ROW_COUNT];
+	float matrix[16];
 
-	elements[0][0] = other.m_elements[0][0] * m_elements[0][0] + other.m_elements[0][1] * m_elements[1][0] + other.m_elements[0][2] * m_elements[2][0] + other.m_elements[0][3] * m_elements[3][0];
-	elements[0][1] = other.m_elements[0][0] * m_elements[0][1] + other.m_elements[0][1] * m_elements[1][1] + other.m_elements[0][2] * m_elements[2][1] + other.m_elements[0][3] * m_elements[3][1];
-	elements[0][2] = other.m_elements[0][0] * m_elements[0][2] + other.m_elements[0][1] * m_elements[1][2] + other.m_elements[0][2] * m_elements[2][2] + other.m_elements[0][3] * m_elements[3][2];
-	elements[0][3] = other.m_elements[0][0] * m_elements[0][3] + other.m_elements[0][1] * m_elements[1][3] + other.m_elements[0][2] * m_elements[2][3] + other.m_elements[0][3] * m_elements[3][3];
-	elements[1][0] = other.m_elements[1][0] * m_elements[0][0] + other.m_elements[1][1] * m_elements[1][0] + other.m_elements[1][2] * m_elements[2][0] + other.m_elements[1][3] * m_elements[3][0];
-	elements[1][1] = other.m_elements[1][0] * m_elements[0][1] + other.m_elements[1][1] * m_elements[1][1] + other.m_elements[1][2] * m_elements[2][1] + other.m_elements[1][3] * m_elements[3][1];
-	elements[1][2] = other.m_elements[1][0] * m_elements[0][2] + other.m_elements[1][1] * m_elements[1][2] + other.m_elements[1][2] * m_elements[2][2] + other.m_elements[1][3] * m_elements[3][2];
-	elements[1][3] = other.m_elements[1][0] * m_elements[0][3] + other.m_elements[1][1] * m_elements[1][3] + other.m_elements[1][2] * m_elements[2][3] + other.m_elements[1][3] * m_elements[3][3];
-	elements[2][0] = other.m_elements[2][0] * m_elements[0][0] + other.m_elements[2][1] * m_elements[1][0] + other.m_elements[2][2] * m_elements[2][0] + other.m_elements[2][3] * m_elements[3][0];
-	elements[2][1] = other.m_elements[2][0] * m_elements[0][1] + other.m_elements[2][1] * m_elements[1][1] + other.m_elements[2][2] * m_elements[2][1] + other.m_elements[2][3] * m_elements[3][1];
-	elements[2][2] = other.m_elements[2][0] * m_elements[0][2] + other.m_elements[2][1] * m_elements[1][2] + other.m_elements[2][2] * m_elements[2][2] + other.m_elements[2][3] * m_elements[3][2];
-	elements[2][3] = other.m_elements[2][0] * m_elements[0][3] + other.m_elements[2][1] * m_elements[1][3] + other.m_elements[2][2] * m_elements[2][3] + other.m_elements[2][3] * m_elements[3][3];
-	elements[3][0] = other.m_elements[3][0] * m_elements[0][0] + other.m_elements[3][1] * m_elements[1][0] + other.m_elements[3][2] * m_elements[2][0] + other.m_elements[3][3] * m_elements[3][0];
-	elements[3][1] = other.m_elements[3][0] * m_elements[0][1] + other.m_elements[3][1] * m_elements[1][1] + other.m_elements[3][2] * m_elements[2][1] + other.m_elements[3][3] * m_elements[3][1];
-	elements[3][2] = other.m_elements[3][0] * m_elements[0][2] + other.m_elements[3][1] * m_elements[1][2] + other.m_elements[3][2] * m_elements[2][2] + other.m_elements[3][3] * m_elements[3][2];
-	elements[3][3] = other.m_elements[3][0] * m_elements[0][3] + other.m_elements[3][1] * m_elements[1][3] + other.m_elements[3][2] * m_elements[2][3] + other.m_elements[3][3] * m_elements[3][3];
+	matrix[0] = GetColumn(0).Dot(other.GetRow(0));
+	matrix[1] = GetColumn(1).Dot(other.GetRow(0));
+	matrix[2] = GetColumn(2).Dot(other.GetRow(0));
+	matrix[3] = GetColumn(3).Dot(other.GetRow(0));
+	matrix[4] = GetColumn(0).Dot(other.GetRow(1));
+	matrix[5] = GetColumn(1).Dot(other.GetRow(1));
+	matrix[6] = GetColumn(2).Dot(other.GetRow(1));
+	matrix[7] = GetColumn(3).Dot(other.GetRow(1));
+	matrix[8] = GetColumn(0).Dot(other.GetRow(2));
+	matrix[9] = GetColumn(1).Dot(other.GetRow(2));
+	matrix[10] = GetColumn(2).Dot(other.GetRow(2));
+	matrix[11] = GetColumn(3).Dot(other.GetRow(2));
+	matrix[12] = GetColumn(0).Dot(other.GetRow(3));
+	matrix[13] = GetColumn(1).Dot(other.GetRow(3));
+	matrix[14] = GetColumn(2).Dot(other.GetRow(3));
+	matrix[15] = GetColumn(3).Dot(other.GetRow(3));
 
-	std::memcpy(m_elements, &elements[0][0], sizeof(float)* MATRIX_COLUMN_COUNT * MATRIX_ROW_COUNT);
+	std::memcpy(m_Matrix, &matrix[0], sizeof(float) * 16);
 
 	return *this;
+}
+
+void Matrix::DebugPrint(bool transposed) const
+{
+	if (!transposed)
+	{
+		GetRow(0).DebugPrint();
+		std::cout << std::endl;
+		GetRow(1).DebugPrint();
+		std::cout << std::endl;
+		GetRow(2).DebugPrint();
+		std::cout << std::endl;
+		GetRow(3).DebugPrint();
+		std::cout << std::endl;
+	}
+	else
+	{
+		GetColumn(0).DebugPrint();
+		std::cout << std::endl;
+		GetColumn(1).DebugPrint();
+		std::cout << std::endl;
+		GetColumn(2).DebugPrint();
+		std::cout << std::endl;
+		GetColumn(3).DebugPrint();
+		std::cout << std::endl;
+	}
 }

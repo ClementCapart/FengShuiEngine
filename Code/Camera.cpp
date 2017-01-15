@@ -4,7 +4,6 @@
 #include "Quaternion.h"
 #include "InputManager.h"
 
-
 Camera::Camera()
 {
 	m_projectionMatrix.SetIdentity();
@@ -35,17 +34,19 @@ void Camera::SetPerspective(float fov, float aspectRatio, float nearClipPlane, f
 		return;
 	}
 
-	float fovRad = fov / 180.0f * (float)M_PI;
-	float tanHalfFov = std::tan(fovRad / 2.0f);
 	float zRange = farClipPlane - nearClipPlane;
 
-	m_projectionMatrix.SetIdentity();
+	float top = nearClipPlane * std::tan(((float)M_PI / 180) * (fov / 2.0f));
+	float bottom = -top;
+	float right = top * aspectRatio;
+	float left = -right;
 
-	m_projectionMatrix.SetValue(0, 0, 1.0f / (aspectRatio * tanHalfFov));
-	m_projectionMatrix.SetValue(1, 1, 1.0f / tanHalfFov);
-	m_projectionMatrix.SetValue(2, 2, (farClipPlane + nearClipPlane) / zRange);
-	m_projectionMatrix.SetValue(3, 2, -(2.0f * farClipPlane * nearClipPlane) / zRange);
-	m_projectionMatrix.SetValue(2, 3, 1.0f);
+	m_projectionMatrix.SetIdentity();
+	m_projectionMatrix.SetValue(0, 0, (2 * nearClipPlane) / (right - left));
+	m_projectionMatrix.SetValue(1, 1, (2 * nearClipPlane) / (top - bottom));
+	m_projectionMatrix.SetValue(2, 2, -(farClipPlane + nearClipPlane) / zRange);
+	m_projectionMatrix.SetValue(2, 3, -1.0f);
+	m_projectionMatrix.SetValue(3, 2, -(2 * farClipPlane * nearClipPlane) / zRange);
 	m_projectionMatrix.SetValue(3, 3, 0.0f);
 }
 

@@ -82,6 +82,7 @@
     <ClCompile Include="Code\Vector2.cpp" />
     <ClCompile Include="Code\Vector3.cpp" />
     <ClCompile Include="Code\Matrix.cpp" />
+    <ClCompile Include="Code\Vector4.cpp" />
     <ClCompile Include="Code\Window\DXWindow.cpp" />
     <ClCompile Include="Code\Window\GLWindow.cpp" />
   </ItemGroup>

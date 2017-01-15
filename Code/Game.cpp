@@ -142,6 +142,8 @@ static GLuint colorBuffer = 0;
 static GLuint uvBuffer = 0;
 static GLuint textureID = 0;
 
+Matrix modelMatrix;
+
 void Game::Init(Window* window)
 {
 	m_currentWindow = window;
@@ -180,7 +182,10 @@ void Game::Init(Window* window)
 	m_camera->SetPosition(m_cameraPosition);
 	//m_camera->SetLookDirection(Vector3::Forward, Vector3::Up);
 	m_camera->SetLookAtPosition(Vector3::Zero, Vector3::Up);
-	m_camera->SetPerspective(60.0f, (float)FengShuiEngine::GetInstance()->GetWindowWidth() / (float) FengShuiEngine::GetInstance()->GetWindowHeight(), 0.1f, 1000.0f);
+	m_camera->SetPerspective(90.0f, (float)FengShuiEngine::GetInstance()->GetWindowWidth() / (float) FengShuiEngine::GetInstance()->GetWindowHeight(), 2.0f, 30.0f);
+
+	modelMatrix.SetIdentity();
+	modelMatrix.SetTranslation(Vector3(0.0f, 0.0f, -5.0f));
 
 	textureID = DataLoader::GetInstance()->LoadBMP("Data/Textures/Cube.bmp");
 }
@@ -204,31 +209,10 @@ void Game::Update()
 {	
 	float moveSpeed = 0.1f;
 
-	if (InputManager::GetInstance()->GetKey(GLFW_KEY_UP))
-	{
-		m_cameraPosition += m_camera->GetViewMatrix().GetColumn(2) * moveSpeed;
-	}
-	else if (InputManager::GetInstance()->GetKey(GLFW_KEY_DOWN))
-	{
-		m_cameraPosition -= m_camera->GetViewMatrix().GetColumn(2) * moveSpeed;
-	}
-
-	if (InputManager::GetInstance()->GetKey(GLFW_KEY_RIGHT))
-	{
-		m_cameraPosition += m_camera->GetDirection().Cross(m_camera->GetUp()) * moveSpeed;
-	}
-	else if (InputManager::GetInstance()->GetKey(GLFW_KEY_LEFT))
-	{
-		m_cameraPosition -= m_camera->GetDirection().Cross(m_camera->GetUp()) * moveSpeed;
-	}
-
-	if (InputManager::GetInstance()->GetKeyDown(GLFW_KEY_SPACE))
-	{
-		m_cameraPosition = -m_cameraPosition;
-	}	
-
 	m_camera->Update(0.0f);
 }
+
+float eulerY = 0.0f;
 
 void Game::Render()
 {
@@ -237,13 +221,15 @@ void Game::Render()
 	GLuint shaderProgramID = ShaderManager::GetInstance()->GetProgram(0);
 	
 	glEnable(GL_DEPTH_TEST);
-	glUseProgram(shaderProgramID);
+	glUseProgram(shaderProgramID);	
+	eulerY += 2.0f;
+	Matrix rotation;
+	rotation.SetIdentity();
+	rotation.RotateEuler(Vector3(eulerY, eulerY, 0));
 
-	Matrix modelMatrix;
-	modelMatrix.SetIdentity();
-	modelMatrix.SetTranslation(Vector3(0.0f, 0.0f, 15.0f));
+	Matrix finalModelMatrix = modelMatrix * rotation;
 
-	Matrix mvp = m_camera->GetProjectionMatrix() * modelMatrix;
+	Matrix mvp = m_camera->GetProjectionMatrix() * finalModelMatrix;
 
 	GLuint mvpID = glGetUniformLocation(shaderProgramID, "MVP");
 	glUniformMatrix4fv(mvpID, 1, GL_FALSE, mvp.GetFirstMatrixElement());
